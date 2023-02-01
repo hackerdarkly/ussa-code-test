@@ -1,0 +1,295 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>USSA</title>
+<link rel="stylesheet" href="css/site.css">
+</head>
+
+<body bgcolor="#7A859E">
+	<div class="header">
+		<img src="images/logo.png" class="logo-small" />
+		<span class="header-text">U.S. Ski and Snowboard Coding Test</span>
+	</div>
+	<div class="search-box">
+		<label class="search-box-text">
+			Search by:&nbsp;&nbsp;
+		</label>
+		<input id="search_first_name_input" type="text" name="first_name" placeholder="First Name"> and/or
+		<input id="search_last_name_input" type="text" name="last_name" placeholder="Last Name">
+		<button id="run_search_btn" class="search-box-submit">Search Now</button>
+	</div>
+	<div class="table-area">
+		<table id="search_display" class="search-results">
+			<tbody>
+			</tbody>
+		</table> 
+	</div>
+	<div class="paging-btn-box">
+		<span class="paging-box-buttons">
+			<span id="pages-display" class="pages-text">[0 pages returned]</span>
+			<button id="prev_page_btn">&lt&lt&lt prev page</button>&nbsp;
+			<button id="next_page_btn">next page &gt&gt&gt</button>
+		</span>
+	</div>
+	<div class="footer">
+	</div>
+
+	<script>
+		let currentPage = 1;
+		let maxPages = 1;
+		let minPages = 1;
+		const pageLength = 6;
+
+		function load_data(first_name, last_name, page) {
+			// load data either initially (no params) or with first/last name search params
+			postSearchData('/data', { first_name: first_name, last_name: last_name})
+				.then((data) => {
+					// build the table contents
+					let tbodyRef = document.getElementById('search_display').getElementsByTagName('tbody')[0];
+					tbodyRef.innerHTML = '';
+
+					if (data.length == 0) {
+						document.getElementById('search_display').className = 'no-search-results';
+						let tableRow = tbodyRef.insertRow();
+						tableRow.insertCell().append(generateNoRecordsMatchDisplay());
+
+						currentPage = 0;
+						maxPages = 0;
+						updatePageDisplay();
+						return;
+					}
+
+					if (data.length >= pageLength) {
+						for(let i=(page * pageLength) - pageLength; i < (page * pageLength); i++) {
+							let tableRow = tbodyRef.insertRow();
+							tableRow.insertCell().append(generateFirstColumnHeaderDiv());
+							tableRow.insertCell().append(generateFirstDataDiv(data[i]));
+							tableRow.insertCell().append(generateSecondColumnHeaderDiv());
+							tableRow.insertCell().append(generateSecondDataDiv(data[i]));
+							tableRow.insertCell().append(generateImageColumnDiv(data[i]));
+						}
+
+						currentPage = page;
+						maxPages = parseInt(data.length / pageLength);
+						updatePageDisplay();
+					}
+					else {
+						data.map(row => {
+							let tableRow = tbodyRef.insertRow();
+							tableRow.insertCell().append(generateFirstColumnHeaderDiv());
+							tableRow.insertCell().append(generateFirstDataDiv(row));
+							tableRow.insertCell().append(generateSecondColumnHeaderDiv());
+							tableRow.insertCell().append(generateSecondDataDiv(row));
+							tableRow.insertCell().append(generateImageColumnDiv(row));
+						})
+
+						currentPage = 1;
+						maxPages = 1;
+						updatePageDisplay();
+					}
+				});
+    	}
+
+		function updatePageDisplay() {
+			let pagesDisplayRef = document.getElementById('pages-display');
+			pagesDisplayRef.textContent = `[${currentPage} of ${maxPages} pages returned]`;
+		}
+
+		function nextPage() {
+			console.log('go next page')
+			let nextPage = currentPage + 1;
+			if (nextPage <= maxPages) {  /* guard */
+				let searchFirstName = document.getElementById('search_first_name_input').value;
+				let searchLastName = document.getElementById('search_last_name_input').value;
+				load_data(searchFirstName, searchLastName, nextPage);
+			}
+		}
+
+		function prevPage() {
+			console.log('go prev page')
+			let prevPage = currentPage - 1;
+			if (prevPage >= minPages) {
+				let searchFirstName = document.getElementById('search_first_name_input').value;
+				let searchLastName = document.getElementById('search_last_name_input').value;
+				load_data(searchFirstName, searchLastName, prevPage);
+			}
+		}
+
+		function generateNoRecordsMatchDisplay() {
+			const noDataSpan = document.createElement('span');
+			noDataSpan.className = 'no-data';
+			noDataSpan.textContent = 'nothing returned.  try your search again.';
+
+			const columnDiv = document.createElement('div');
+			columnDiv.append(noDataSpan);
+			return columnDiv;
+		}
+
+		function generateFirstColumnHeaderDiv() {
+			const nameSpan = document.createElement('span');
+			nameSpan.className = 'data field-header';
+			nameSpan.textContent = 'Name: ';
+
+			const companySpan = document.createElement('span');
+			companySpan.className = 'data field-header';
+			companySpan.textContent = 'Company: ';
+
+			const titleSpan = document.createElement('span');
+			titleSpan.className = 'data field-header';
+			titleSpan.textContent = 'Title: ';
+
+			const deptSpan = document.createElement('span');
+			deptSpan.className = 'data field-header';
+			deptSpan.textContent = 'Department: ';
+
+			const columnDiv = document.createElement('div');
+			columnDiv.className = 'column';
+
+			columnDiv.append(nameSpan);
+			columnDiv.append(companySpan);
+			columnDiv.append(titleSpan);
+			columnDiv.append(deptSpan);
+
+			return columnDiv;
+		}
+
+		function generateFirstDataDiv(dataRow) {
+			const nameSpan = document.createElement('span');
+			nameSpan.className = 'data';
+			nameSpan.textContent = `\
+			${dataRow.firstName ? dataRow.firstName : ""}\
+			${dataRow.lastName ? dataRow.lastName : ""}`;
+
+			const companySpan = document.createElement('span');
+			companySpan.className = 'data';
+			companySpan.textContent = `${dataRow.company ? dataRow.company : "N/A"}`;
+
+			const titleSpan = document.createElement('span');
+			titleSpan.className = 'data';
+			titleSpan.textContent = `${dataRow.title ? dataRow.title : "N/A"}`;
+
+			const deptSpan = document.createElement('span');
+			deptSpan.className = 'data';
+			deptSpan.textContent = `${dataRow.department ? dataRow.department : 'N/A'}`;
+
+			const columnDiv = document.createElement('div');
+			columnDiv.className = 'column';
+
+			columnDiv.append(nameSpan);
+			columnDiv.append(companySpan);
+			columnDiv.append(titleSpan);
+			columnDiv.append(deptSpan);
+
+			return columnDiv;
+		}
+
+		function generateSecondColumnHeaderDiv() {
+			const phoneSpan = document.createElement('span');
+			phoneSpan.className = 'data field-header';
+			phoneSpan.textContent = 'Phone: ';
+
+			const addressSpan = document.createElement('span');
+			addressSpan.className = 'data field-header';
+			addressSpan.textContent = 'Address: ';
+
+			const spaceSpan = document.createElement('span');
+			spaceSpan.className = 'data field-header';
+			spaceSpan.textContent = '\u00a0';
+
+			const websiteSpan = document.createElement('span');
+			websiteSpan.className = 'data field-header';
+			websiteSpan.textContent = 'Website: ';
+
+			const columnDiv = document.createElement('div');
+			columnDiv.className = 'column';
+
+			columnDiv.append(phoneSpan);
+			columnDiv.append(addressSpan);
+			columnDiv.append(spaceSpan);
+			columnDiv.append(websiteSpan);
+
+			return columnDiv;
+		}
+
+		function generateSecondDataDiv(dataRow) {
+			const phoneSpan = document.createElement('span');
+			phoneSpan.className = 'data';
+			phoneSpan.textContent = `${dataRow.phone ? dataRow.phone : "N/A"}`;
+
+			const addressSpan = document.createElement('span');
+			addressSpan.className = 'data';
+			addressSpan.textContent = `${dataRow.address ? dataRow.address : "N/A"}`;
+
+			const cityStateZipSpan = document.createElement('span');
+			cityStateZipSpan.className = 'data';
+			cityStateZipSpan.textContent = `\
+			${dataRow.city ? dataRow.city + ',' : ""} \
+			${dataRow.state ? dataRow.state : ""} \
+			${dataRow.zip ? dataRow.zip : ""}`;
+
+			const urlSpan = document.createElement('span');
+			urlSpan.className = 'data';
+			urlSpan.textContent = `${dataRow.url ? dataRow.url : "N/A"}`;
+
+			const columnDiv = document.createElement('div');
+			columnDiv.className = 'column';
+
+			columnDiv.append(phoneSpan);
+			columnDiv.append(addressSpan);
+			columnDiv.append(cityStateZipSpan);
+			columnDiv.append(urlSpan);
+
+			return columnDiv;
+		}
+
+		function generateImageColumnDiv(dataRow) {
+			const imageElement = document.createElement('img');
+			imageElement.className = 'contact-small-image';
+			imageElement.src = `${dataRow.image}`;
+			imageElement.alt = 'no contact photo'
+
+			const columnDiv = document.createElement('div');
+			columnDiv.className = 'image';
+
+			columnDiv.append(imageElement);
+			return columnDiv;
+		}
+
+		// load all data on startup-- show the full list
+		window.addEventListener('load', event => {
+    		load_data(null, null, minPages);
+    	});
+
+		// search for either first or last name, or both
+		let search_btn = document.getElementById("run_search_btn");
+		search_btn.addEventListener('click', event => {
+			let searchFirstName = document.getElementById('search_first_name_input').value;
+			let searchLastName = document.getElementById('search_last_name_input').value;
+			load_data(searchFirstName, searchLastName, minPages);
+		});
+
+		let prev_page_btn = document.getElementById("prev_page_btn");
+		prev_page_btn.addEventListener('click', event => {
+			prevPage();
+		})
+
+		let next_page_btn = document.getElementById("next_page_btn");
+		next_page_btn.addEventListener('click', event => {
+			nextPage();
+		})
+
+		async function postSearchData(url = '', data = {}) {
+			const response = await fetch(url, {
+				method: 'POST',
+				cache: 'no-cache',
+				headers: {
+				'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(data)
+			});
+			return response.json();
+		}
+	</script>
+</body>
+</html>

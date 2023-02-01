@@ -1,0 +1,119 @@
+@charset "utf-8";
+/* CSS Document */
+
+.header {
+	height: 150px;
+	margin: 0 auto;
+	width: 600px;
+}
+
+.table-area {
+	margin: 0 auto;
+}
+
+table.search-results {
+	border: none;
+	border-collapse: collapse;
+	margin: 0 auto;
+}
+
+table.no-search-results {
+	border: none;
+	border-collapse: collapse;
+	margin: 0 auto;
+}
+
+tr {
+	height: 125px;
+	border: none;
+}
+
+td {
+	border: none;
+}
+
+.footer {
+	height: 150px;
+}
+
+tr:nth-child(odd) {
+    background-color: #FFFFFF;
+}
+
+tr:nth-child(even) {
+    background-color: #F6F6F6;
+}
+
+span.data {
+	font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+	display: block;
+}
+
+span.no-data {
+	font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+	display: block;
+	width: 100%;
+}
+
+span.field-header {
+	font-weight: bold;
+}
+
+span.pages-text {
+	float: left;
+	padding-right: 20px;
+}
+
+div.column {
+	padding-left: 20px;
+}
+
+.contact-small-image {
+	height: 90px;
+	width: 120px;
+	padding-left: 120px;
+	padding-right: 60px;
+}
+
+/* search box */
+
+.search-box {
+	max-width: 825px;
+	margin: 0 auto;
+	padding-bottom: 10px;
+}
+
+.paging-btn-box {
+	max-width: 825px;
+	margin: 0 auto;
+	padding-bottom: 10px;
+}
+
+.search-box-text {
+	float: left;
+	font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+}
+
+.search-box-submit {
+	float: right;
+}
+
+.paging-box-buttons {
+	padding-top: 10px;
+	float: right;
+}
+
+.logo-small {
+	height: 80px;
+	padding-top: 20px;
+}
+
+span.header-text {
+	font-family: Segoe, "Segoe UI", "DejaVu Sans", "Trebuchet MS", Verdana, "sans-serif";
+	font-size: 32px;
+	color: #FFFFFF;
+	padding-bottom: 50px;
+	padding-left: 20px;;
+	position: absolute;
+	top: 40px;
+}
